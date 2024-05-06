@@ -1,0 +1,8 @@
+- Ignore 0x02001301 identifiers and skip 0x14 bytes after them
+
+Identifiers:
+- 0x1701B502 - Texture
+
+If identifier is found:
+- uint32 -> Length
+- uint32 -> Offset

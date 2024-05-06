@@ -1,0 +1,2 @@
+- .code is written with ARM11 -> ARMv6 architecture
+- https://lioncash.github.io/ARMBook/arm11_mpcore/README.html

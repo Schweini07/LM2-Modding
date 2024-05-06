@@ -1,0 +1,17 @@
+https://github.com/KillzXGaming/NLG_Research/wiki/Texture-Chunk
+https://github.com/hadashisora/LM2L
+https://www.vg-resource.com/thread-34640.html
+
+- 0x0-0x3: Identifier - 0xE977D350
+- 0x4-0x7: Hash ID
+- 0x8-0xb: Length of the texture in bytes
+
+==================
+
+- 0xc-0xf: Hash ID again
+- 0x10-0x13: Padding
+- 0x14-0x17: Unknown
+- 0x18-0x19: Width
+- 0x1a-0x1b: Height
+- 0x1F: Mipmap level
+- 0x38: Compression format - either ETC1 or ETC1A4

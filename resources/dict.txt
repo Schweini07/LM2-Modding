@@ -1,0 +1,30 @@
+.dict:
+- sourced from https://github.com/hadashisora/LM2L
+- and https://github.com/KillzXGaming/NextLevelLibrary/blob/master/Games/LM2/DICT_Parser.cs
+
+- art/feghosts/boo.dict was used as reference here
+- everything is encoded in little endian
+
+- 0x0-0x3: identifier - 58 24 F3 A9
+- 0x4-0x5: header flags
+- 0x6: compression flag - 0x0 -> uncompressed; 0x1 -> compressed with zlib
+- 0x7: padding
+- 0x8-0xb: file count -> amount of chunks in .data that can be formatted to a file
+- (0x9: maybe string count) 
+- 0xc-0xf: largest compressed file
+- 0x10 - 0x2b: unknown
+
+=== From here the file structure can be dependent on what the file count is. Most of the time .dict files in Luigi's Mansion 2 contain 8 files, so we'll assume that this is the case here  ===
+- 0x2c-0x33: correlates to the amount of files in the .dict, but purpose unknown
+
+=== Every file is now given properties with 4*4 bytes, for demonstration only one file and it's properties are listed in this document ===
+- 0x34-0x37: offset in the .data file
+- 0x38-0x3b: decompressed file length
+- 0x3c-0x3f: compressed file length
+- 0x40-0x43: flags -> two resource flags and one resource index
+
+.data:
+file0 -> File table
+file1 -> File table debug (probably)
+file2 -> Texture data (identifier 0x50D377E9)
+file3 -> Model data
