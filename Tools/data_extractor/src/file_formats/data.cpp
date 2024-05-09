@@ -26,6 +26,28 @@ void Data::ExtractDataFiles(Dict *dict)
     }
 }
 
+void Data::RepackDataFiles(Dict *dict)
+{
+    std::ofstream repacked_file(file_path + ".repacked");
+    for (DataFile &data_file : dict->file_array)
+    {
+        if (is_compressed)
+            CompressDataFile(data_file);
+
+        uint32_t data_file_size = is_compressed ? data_file.compressed_file_length : data_file.decompressed_file_length;
+        std::cout << "File Size: " << data_file_size << "\n";
+        char data[data_file_size];
+        std::ifstream extracted_file(data_file.file_path);
+        extracted_file.read(data, data_file_size);
+        extracted_file.close();
+
+        repacked_file.seekp(data_file.offset);
+
+        repacked_file.write(data, data_file_size);
+    }
+    repacked_file.close();
+}
+
 void Data::ExtractDataFile(DataFile &data_file)
 {
     data_file.file_path = dir_name + "/file" + std::to_string(data_file.id);
@@ -56,12 +78,12 @@ void Data::ExtractDataFile(DataFile &data_file)
 void Data::DecompressDataFile(DataFile &data_file)
 {
     char compressed_data[data_file.compressed_file_length];
+    uLongf compressed_size = data_file.compressed_file_length;
     char decompressed_data[data_file.decompressed_file_length];
     uLongf decompressed_size = data_file.decompressed_file_length;
-    uLongf compressed_size = data_file.compressed_file_length;
 
     std::ifstream compressed_file(data_file.file_path);
-    compressed_file.read(compressed_data, data_file.compressed_file_length);
+    compressed_file.read(compressed_data, compressed_size);
     compressed_file.close();
 
     uncompress((Bytef *)decompressed_data, &decompressed_size, (Bytef *)compressed_data, compressed_size);
@@ -70,4 +92,21 @@ void Data::DecompressDataFile(DataFile &data_file)
     decompressed_file.write(decompressed_data, decompressed_size);
     decompressed_file.close();
 }
- 
+
+void Data::CompressDataFile(DataFile &data_file)
+{
+    char decompressed_data[data_file.decompressed_file_length];
+    uLongf decompressed_size = data_file.decompressed_file_length;
+    char compressed_data[data_file.compressed_file_length];
+    uLongf compressed_size = data_file.compressed_file_length;
+    
+    std::ifstream decompressed_file(data_file.file_path);
+    decompressed_file.read(decompressed_data, decompressed_size);
+    decompressed_file.close();
+
+    compress((Bytef *)compressed_data, &compressed_size, (Bytef *)decompressed_data, decompressed_size);
+
+    std::ofstream compressed_file(data_file.file_path + ".repacked");
+    compressed_file.write(compressed_data, compressed_size);
+    compressed_file.close();
+}

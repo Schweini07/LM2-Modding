@@ -13,12 +13,15 @@ public:
     ~Data() = default;
 
     void ExtractDataFiles(Dict *dict);
-    void ExtractDataFile(DataFile &data_file);
-    void DecompressDataFile(DataFile &data_file);
+    void RepackDataFiles(Dict *dict);
 
     bool is_compressed;
 
 private:
+    void ExtractDataFile(DataFile &data_file);
+    void DecompressDataFile(DataFile &data_file);
+    void CompressDataFile(DataFile &data_file);
+
     std::string file_path;
     std::string dir_name;
 };

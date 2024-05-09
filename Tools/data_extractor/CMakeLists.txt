@@ -12,7 +12,7 @@ include(FetchContent)
 FetchContent_Declare(
     tgui
     GIT_REPOSITORY https://github.com/texus/TGUI.git
-    GIT_TAG e1f3a79763f09eb76aeca0b8c07e120be17454d7
+    GIT_TAG 2caf86a8a89c18b8aec6881b88d53cf5c039d4b9
 )
 FetchContent_MakeAvailable(tgui)
 

@@ -1,7 +1,5 @@
 #include "gui.hpp"
 
-#include "file_formats/dict.hpp"
-#include "file_formats/data.hpp"
 #include "file_formats/texture.hpp"
 #include "extracted_files/file_table.hpp"
 #include "extracted_files/texture_metadata_file.hpp"
@@ -9,6 +7,7 @@
 
 GUI::GUI()
 {
+    dark_theme.load("resources/themes/Dark.txt");
 }
 
 void GUI::StartApplication()
@@ -78,20 +77,44 @@ void GUI::LoadMainForm()
         
         ExtractFiles();
     });
+
+
+    extracted_files_panel_list_box = gui->get<tgui::PanelListBox>("ExtractedFilesPanelListBox");
+
+    repack_files_button = gui->get<tgui::Button>("RepackFilesButton");
+    repack_files_button->onPress([this] {
+        data->RepackDataFiles(dict.get());
+    });
+}
+
+void GUI::InitExtractedFilesPanelListBox(const std::vector<DataFile> &extracted_files)
+{
+    for (const DataFile &data_file : extracted_files)
+    {
+        // Conversion is needed, because else no number is displayed for some reason
+        tgui::String id(data_file.id);
+        tgui::String file_name = "File" + id;
+
+        tgui::Panel::Ptr item_panel = extracted_files_panel_list_box->addItem(id);
+        item_panel->setRenderer(dark_theme.getRenderer("Panel"));
+
+        tgui::Label::Ptr file_name_label = tgui::Label::create(file_name);
+        item_panel->add(file_name_label);
+    }
 }
 
 void GUI::ExtractFiles()
 {
-    Dict dict(dict_file_path.toStdString());
-    dict.ParseDict();
+    dict = std::make_unique<Dict>(dict_file_path.toStdString());
+    dict->ParseDict();
 
-    Data data(data_file_path.toStdString());
-    data.ExtractDataFiles(&dict);
+    data = std::make_unique<Data>(data_file_path.toStdString());
+    data->ExtractDataFiles(dict.get());
 
-    FileTable file_table(dict.file_array[0].file_path);
+    FileTable file_table(dict->file_array[0].file_path);
     file_table.Parse();
 
-    TextureMetaDataFile text_metadata_file(dict.file_array[2].file_path);
+    TextureMetaDataFile text_metadata_file(dict->file_array[2].file_path);
     text_metadata_file.Parse();
 
     for (size_t i = 0; i < file_table.texture_data.size(); i++)
@@ -99,8 +122,10 @@ void GUI::ExtractFiles()
         FileTableEntry texture_entry = file_table.texture_data[i];
         TextureMetaData texture_metadata = text_metadata_file.texture_metadata[i];
 
-        ExtractTexture(texture_entry, texture_metadata, dict.file_array[3].file_path);
+        ExtractTexture(texture_entry, texture_metadata, dict->file_array[3].file_path);
     }
+
+    InitExtractedFilesPanelListBox(dict->file_array);
 }
 
 void GUI::ExtractTexture(FileTableEntry &texture_entry, TextureMetaData texture_metadata, std::string mixed_data_file_path)
