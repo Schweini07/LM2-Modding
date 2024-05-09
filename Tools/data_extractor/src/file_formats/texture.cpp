@@ -1,8 +1,8 @@
 #include "texture.hpp"
 
 #include "bitmap.hpp"
-#include <ETC1Lib/ETC1Lib/ETC1.cpp>
-#include <lodepng/lodepng.h>
+//#include <ETC1Lib/ETC1Lib/ETC1.cpp>
+//#include <lodepng/lodepng.h>
 #include <fstream>
 #include <iostream>
 
@@ -16,14 +16,14 @@ void Texture::DecodeETC1()
 {
     decoded_data = std::make_unique<unsigned int[]>(decoded_data_size);
 
-    ConvertETC1(
+/*     ConvertETC1(
         decoded_data.get(),
         &decoded_data_size, 
         reinterpret_cast<unsigned int *>(texture_data.data()),
         width,
         height,
         alpha
-    );
+    ); */
 }
 
 void Texture::Save(std::string file_path)

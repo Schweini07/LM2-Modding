@@ -38,9 +38,5 @@ src/gui/gui.cpp
 target_link_libraries(data_extractor Binary-Reader)
 target_link_libraries(data_extractor tgui)
 target_link_libraries(data_extractor ZLIB::ZLIB)
-target_link_libraries(data_extractor ETC1Lib)
-target_link_libraries(data_extractor LodePNG)
 
 add_subdirectory(lib/Binary-Reader)
-add_subdirectory(lib/ETC1Lib)
-add_subdirectory(lib/lodepng)
