@@ -8,6 +8,28 @@
 
 Data::Data(std::string file_path) : file_path(file_path)
 {
+    std::ifstream data_file(file_path, std::ifstream::ate);
+    file_size = data_file.tellg();
+    data_file.close();
+
+    std::cout << file_size << "\n";
+}
+
+void Data::GetDataBuffer(std::vector<uint8_t> &data_buffer, uint32_t offset, uint32_t buffer_size)
+{
+    data_buffer.resize(buffer_size);
+
+    std::ifstream data_file(file_path);
+
+    data_file.seekg(offset);
+    data_file.read(reinterpret_cast<char *>(data_buffer.data()), buffer_size);
+
+    data_file.close();
+}
+
+uint32_t Data::GetFileSize()
+{
+    return file_size;
 }
 
 void Data::ExtractDataFiles(Dict *dict)
@@ -17,7 +39,7 @@ void Data::ExtractDataFiles(Dict *dict)
     dir_name = "data_files_";
     dir_name += std::filesystem::path(file_path).filename().generic_string();
     std::filesystem::create_directories(dir_name);
-    for (DataFile &data_file : dict->file_array)
+    for (FileSection &data_file : dict->file_array)
     {
         ExtractDataFile(data_file);
 
@@ -29,7 +51,7 @@ void Data::ExtractDataFiles(Dict *dict)
 void Data::RepackDataFiles(Dict *dict)
 {
     std::ofstream repacked_file(file_path + ".repacked");
-    for (DataFile &data_file : dict->file_array)
+    for (FileSection &data_file : dict->file_array)
     {
         if (is_compressed)
             CompressDataFile(data_file);
@@ -37,7 +59,7 @@ void Data::RepackDataFiles(Dict *dict)
         uint32_t data_file_size = is_compressed ? data_file.compressed_file_length : data_file.decompressed_file_length;
         std::cout << "File Size: " << data_file_size << "\n";
         char data[data_file_size];
-        std::ifstream extracted_file(data_file.file_path);
+        std::ifstream extracted_file(data_file.file_path + ".repacked");
         extracted_file.read(data, data_file_size);
         extracted_file.close();
 
@@ -48,7 +70,7 @@ void Data::RepackDataFiles(Dict *dict)
     repacked_file.close();
 }
 
-void Data::ExtractDataFile(DataFile &data_file)
+void Data::ExtractDataFile(FileSection &data_file)
 {
     data_file.file_path = dir_name + "/file" + std::to_string(data_file.id);
     std::cout << data_file.file_path << "\n";
@@ -75,7 +97,7 @@ void Data::ExtractDataFile(DataFile &data_file)
     new_file.close();
 }
 
-void Data::DecompressDataFile(DataFile &data_file)
+void Data::DecompressDataFile(FileSection &data_file)
 {
     char compressed_data[data_file.compressed_file_length];
     uLongf compressed_size = data_file.compressed_file_length;
@@ -93,7 +115,7 @@ void Data::DecompressDataFile(DataFile &data_file)
     decompressed_file.close();
 }
 
-void Data::CompressDataFile(DataFile &data_file)
+void Data::CompressDataFile(FileSection &data_file)
 {
     char decompressed_data[data_file.decompressed_file_length];
     uLongf decompressed_size = data_file.decompressed_file_length;

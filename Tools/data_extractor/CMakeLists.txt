@@ -4,25 +4,40 @@ project (DataExtractor)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
 
+include(FetchContent)
+
+find_package(SFML COMPONENTS graphics QUIET)
+if (NOT SFML_FOUND)
+    FetchContent_Declare(
+        sfml
+        GIT_REPOSITORY https://github.com/SFML/SFML.git
+        GIT_TAG b49dfebcfd4ef7a72e9efceaf0eb28eb949d4799
+    )
+    FetchContent_MakeAvailable(sfml)
+endif()
+
 # include TGUI library
 set(TGUI_BACKEND SFML_GRAPHICS)
 set(TGUI_BUILD_FRAMEWORK FALSE)
 
-include(FetchContent)
-FetchContent_Declare(
-    tgui
-    GIT_REPOSITORY https://github.com/texus/TGUI.git
-    GIT_TAG 2caf86a8a89c18b8aec6881b88d53cf5c039d4b9
-)
-FetchContent_MakeAvailable(tgui)
+find_package(TGUI QUIET)
+if (NOT TGUI_FOUND)
+    FetchContent_Declare(
+        tgui
+        GIT_REPOSITORY https://github.com/texus/TGUI.git
+        GIT_TAG 9967a777d3a80870fc7da08ad7f29c96937143df
+    )
+    FetchContent_MakeAvailable(tgui)
+endif()
 
-find_package(ZLIB)
+find_package(ZLIB REQUIRED)
 
 include_directories(src)
 include_directories(lib)
 
 add_executable(data_extractor
 src/main.cpp
+src/dict_data_manager.cpp
 
 src/file_formats/dict.cpp
 src/file_formats/data.cpp
@@ -34,6 +49,8 @@ src/extracted_files/texture_metadata_file.cpp
 src/extracted_files/mixed_data_file.cpp
 
 src/gui/gui.cpp
+
+src/utils/FileSystemDirectoryHandler.cpp
 )
 target_link_libraries(data_extractor Binary-Reader)
 target_link_libraries(data_extractor tgui)

@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-struct DataFile
+struct FileSection
 {
     uint8_t id;
     uint8_t unknown;
@@ -22,14 +22,14 @@ public:
     Dict(std::string file_path = "");
     ~Dict() = default;
 
-    void ParseDict(std::string file_path = "");
+    void Parse(std::string file_path = "");
 
     uint32_t identifier = 0xA9F32458;
     uint16_t header_flags;
     uint8_t compression_flag;
     uint32_t file_count;
     uint32_t largest_compressed_file;
-    std::vector<DataFile> file_array;
+    std::vector<FileSection> file_array;
 
 private:
     std::string file_path;

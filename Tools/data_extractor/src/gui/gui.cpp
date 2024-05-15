@@ -70,9 +70,24 @@ void GUI::LoadMainForm()
         gui->add(file_dialog);
     });
 
+    directory_path_edit_box = gui->get<tgui::EditBox>("DirectoryPathEditBox");
+    directory_path_edit_box->onTextChange([this] {
+        destination_directory_path = directory_path_edit_box->getText();
+    });
+
+    directory_path_button = gui->get<tgui::Button>("DirectoryPathButton");
+    directory_path_button->onPress([this] {
+        tgui::FileDialog::Ptr file_dialog = tgui::FileDialog::create("Choose directory", "Select", false);
+        file_dialog->onFileSelect([this, file_dialog] {
+            directory_path_edit_box->setText(file_dialog->getSelectedPaths()[0].asString());
+        });
+
+        gui->add(file_dialog);
+    });
+
     start_extraction_button = gui->get<tgui::Button>("StartExtractionButton");
     start_extraction_button->onPress([this] {
-        if (dict_file_path == "" || data_file_path == "")
+        if (dict_file_path == "" || data_file_path == "" || destination_directory_path == "")
             return;
         
         ExtractFiles();
@@ -80,23 +95,23 @@ void GUI::LoadMainForm()
 
 
     extracted_files_panel_list_box = gui->get<tgui::PanelListBox>("ExtractedFilesPanelListBox");
+    extracted_files_panel_list_box->setRenderer(dark_theme.getRenderer("Panel"));
 
     repack_files_button = gui->get<tgui::Button>("RepackFilesButton");
     repack_files_button->onPress([this] {
-        data->RepackDataFiles(dict.get());
+        dict_data_manager->RepackFiles();
     });
 }
 
-void GUI::InitExtractedFilesPanelListBox(const std::vector<DataFile> &extracted_files)
+void GUI::InitExtractedFilesPanelListBox(const std::vector<FileSection> &extracted_files)
 {
-    for (const DataFile &data_file : extracted_files)
+    for (const FileSection &data_file : extracted_files)
     {
         // Conversion is needed, because else no number is displayed for some reason
         tgui::String id(data_file.id);
         tgui::String file_name = "File" + id;
 
         tgui::Panel::Ptr item_panel = extracted_files_panel_list_box->addItem(id);
-        item_panel->setRenderer(dark_theme.getRenderer("Panel"));
 
         tgui::Label::Ptr file_name_label = tgui::Label::create(file_name);
         item_panel->add(file_name_label);
@@ -105,13 +120,10 @@ void GUI::InitExtractedFilesPanelListBox(const std::vector<DataFile> &extracted_
 
 void GUI::ExtractFiles()
 {
-    dict = std::make_unique<Dict>(dict_file_path.toStdString());
-    dict->ParseDict();
+    dict_data_manager = std::make_unique<DictDataManager>(dict_file_path.toStdString(), data_file_path.toStdString(), destination_directory_path.toStdString());
+    dict_data_manager->ExtractFiles();
 
-    data = std::make_unique<Data>(data_file_path.toStdString());
-    data->ExtractDataFiles(dict.get());
-
-    FileTable file_table(dict->file_array[0].file_path);
+/*     FileTable file_table(dict->file_array[0].file_path);
     file_table.Parse();
 
     TextureMetaDataFile text_metadata_file(dict->file_array[2].file_path);
@@ -123,9 +135,9 @@ void GUI::ExtractFiles()
         TextureMetaData texture_metadata = text_metadata_file.texture_metadata[i];
 
         ExtractTexture(texture_entry, texture_metadata, dict->file_array[3].file_path);
-    }
+    } */
 
-    InitExtractedFilesPanelListBox(dict->file_array);
+    //InitExtractedFilesPanelListBox(dict->file_array);
 }
 
 void GUI::ExtractTexture(FileTableEntry &texture_entry, TextureMetaData texture_metadata, std::string mixed_data_file_path)

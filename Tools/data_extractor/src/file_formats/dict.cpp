@@ -7,7 +7,7 @@ Dict::Dict(std::string file_path) : file_path(file_path)
 {
 }
 
-void Dict::ParseDict(std::string file_path)
+void Dict::Parse(std::string file_path)
 {
     if ("" == file_path)
         file_path = this->file_path;
@@ -34,7 +34,7 @@ void Dict::ParseDict(std::string file_path)
 
     for (size_t i = 0; i < file_count; i++)
     {
-        DataFile data_file;
+        FileSection data_file;
         data_file.id = i;
         data_file.unknown = reader.readUInt8();
         file_array.push_back(data_file);
