@@ -78,6 +78,8 @@ void GUI::LoadMainForm()
     directory_path_button = gui->get<tgui::Button>("DirectoryPathButton");
     directory_path_button->onPress([this] {
         tgui::FileDialog::Ptr file_dialog = tgui::FileDialog::create("Choose directory", "Select", false);
+        file_dialog->setSelectingDirectory(true);
+
         file_dialog->onFileSelect([this, file_dialog] {
             directory_path_edit_box->setText(file_dialog->getSelectedPaths()[0].asString());
         });
