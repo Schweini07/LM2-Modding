@@ -51,6 +51,8 @@ void GUI::LoadMainForm()
         file_dialog->onFileSelect([this, file_dialog] {
            load_dict_button->setText(file_dialog->getSelectedPaths()[0].getFilename());
            dict_file_path = file_dialog->getSelectedPaths()[0].asString();
+
+           HandleStartExtractionButtonState();
         });
 
         gui->add(file_dialog);
@@ -65,6 +67,8 @@ void GUI::LoadMainForm()
         file_dialog->onFileSelect([this, file_dialog] {
            load_data_button->setText(file_dialog->getSelectedPaths()[0].getFilename());
            data_file_path = file_dialog->getSelectedPaths()[0].asString();
+           
+           HandleStartExtractionButtonState();
         });
         
         gui->add(file_dialog);
@@ -73,11 +77,13 @@ void GUI::LoadMainForm()
     directory_path_edit_box = gui->get<tgui::EditBox>("DirectoryPathEditBox");
     directory_path_edit_box->onTextChange([this] {
         destination_directory_path = directory_path_edit_box->getText();
+
+        HandleStartExtractionButtonState();
     });
 
     directory_path_button = gui->get<tgui::Button>("DirectoryPathButton");
     directory_path_button->onPress([this] {
-        tgui::FileDialog::Ptr file_dialog = tgui::FileDialog::create("Choose directory", "Select", false);
+        tgui::FileDialog::Ptr file_dialog = tgui::FileDialog::create("Choose directory", "Select", true);
         file_dialog->setSelectingDirectory(true);
 
         file_dialog->onFileSelect([this, file_dialog] {
@@ -88,11 +94,10 @@ void GUI::LoadMainForm()
     });
 
     start_extraction_button = gui->get<tgui::Button>("StartExtractionButton");
-    start_extraction_button->onPress([this] {
-        if (dict_file_path == "" || data_file_path == "" || destination_directory_path == "")
-            return;
-        
+    HandleStartExtractionButtonState();
+    start_extraction_button->onPress([this] {        
         ExtractFiles();
+        repack_files_button->setEnabled(true);
     });
 
 
@@ -100,6 +105,7 @@ void GUI::LoadMainForm()
     extracted_files_panel_list_box->setRenderer(dark_theme.getRenderer("Panel"));
 
     repack_files_button = gui->get<tgui::Button>("RepackFilesButton");
+    repack_files_button->setEnabled(false);
     repack_files_button->onPress([this] {
         dict_data_manager->RepackFiles();
     });
@@ -118,6 +124,17 @@ void GUI::InitExtractedFilesPanelListBox(const std::vector<FileSection> &extract
         tgui::Label::Ptr file_name_label = tgui::Label::create(file_name);
         item_panel->add(file_name_label);
     }
+}
+
+void GUI::HandleStartExtractionButtonState()
+{
+    if (dict_file_path == "" || data_file_path == "" || destination_directory_path == "")
+    {
+        start_extraction_button->setEnabled(false);
+        return;
+    }
+    
+    start_extraction_button->setEnabled(true);
 }
 
 void GUI::ExtractFiles()

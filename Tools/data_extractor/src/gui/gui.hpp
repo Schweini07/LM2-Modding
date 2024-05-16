@@ -20,6 +20,7 @@ public:
 private:
     void LoadMainForm();
     void InitExtractedFilesPanelListBox(const std::vector<FileSection> &extracted_files);
+    void HandleStartExtractionButtonState();
 
     void ExtractFiles();
     void ExtractTexture(FileTableEntry &texture_entry, TextureMetaData texture_metadata, std::string mixed_data_file_path);
