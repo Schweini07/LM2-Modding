@@ -11,7 +11,7 @@ if (NOT SFML_FOUND)
     FetchContent_Declare(
         sfml
         GIT_REPOSITORY https://github.com/SFML/SFML.git
-        GIT_TAG b49dfebcfd4ef7a72e9efceaf0eb28eb949d4799
+        GIT_TAG 69ea0cd863aed1d4092b970b676924a716ff718b
     )
     FetchContent_MakeAvailable(sfml)
 endif()
