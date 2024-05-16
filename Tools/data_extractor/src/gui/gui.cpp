@@ -105,7 +105,10 @@ void GUI::LoadMainForm()
     extracted_files_panel_list_box->setRenderer(dark_theme.getRenderer("Panel"));
 
     repack_files_button = gui->get<tgui::Button>("RepackFilesButton");
-    repack_files_button->setEnabled(false);
+    if (!start_extraction_button->isEnabled())
+    {
+        repack_files_button->setEnabled(false);
+    }
     repack_files_button->onPress([this] {
         dict_data_manager->RepackFiles();
     });
