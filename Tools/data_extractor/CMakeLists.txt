@@ -6,6 +6,7 @@ set(CMAKE_CXX_FLAGS_DEBUG "-g")
 
 include(FetchContent)
 
+# include SFML
 find_package(SFML COMPONENTS graphics QUIET)
 if (NOT SFML_FOUND)
     FetchContent_Declare(
@@ -16,7 +17,7 @@ if (NOT SFML_FOUND)
     FetchContent_MakeAvailable(sfml)
 endif()
 
-# include TGUI library
+# include TGUI
 set(TGUI_BACKEND SFML_GRAPHICS)
 set(TGUI_BUILD_FRAMEWORK FALSE)
 
@@ -30,7 +31,18 @@ if (NOT TGUI_FOUND)
     FetchContent_MakeAvailable(tgui)
 endif()
 
-find_package(ZLIB REQUIRED)
+# include zlib
+find_package(ZLIB QUIET)
+if (NOT ZLIB_FOUND)
+    FetchContent_Declare(
+        zlib
+        GIT_REPOSITORY https://github.com/madler/zlib.git
+        GIT_TAG 0f51fb4933fc9ce18199cb2554dacea8033e7fd3
+    )
+    FetchContent_MakeAvailable(zlib)
+
+  add_library(ZLIB::ZLIB ALIAS zlib)
+endif()
 
 include_directories(src)
 include_directories(lib)
